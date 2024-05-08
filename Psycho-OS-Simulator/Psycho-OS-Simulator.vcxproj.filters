@@ -21,9 +21,15 @@
     <ClCompile Include="openFile.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="inputPriority.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="openFile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inputPriority.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

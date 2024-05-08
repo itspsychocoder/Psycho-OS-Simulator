@@ -106,11 +106,13 @@ int main()
 
     std::vector<ClickableElement> clickableElements;
 
-    ClickableElement element(folder, font, "Hello", 100);
-    clickableElements.emplace_back(element);
-    ClickableElement element2(folder, font, "Hello2", 300);
-    clickableElements.emplace_back(element2);
-    sf::RenderWindow window(sf::VideoMode(600, 600), "SFML works!");
+    ClickableElement music(folder, font, "Music", 100);
+    ClickableElement notepad(folder, font, "Notepad", 300);
+    ClickableElement git(folder, font, "Git", 500);
+    clickableElements.emplace_back(music);
+    clickableElements.emplace_back(notepad);
+    clickableElements.emplace_back(git);
+    sf::RenderWindow window(sf::VideoMode(600, 600), "Psycho OS Simulator");
   /*  sf::CircleShape shape(100.f);
     shape.setFillColor(sf::Color::Green);*/
 
