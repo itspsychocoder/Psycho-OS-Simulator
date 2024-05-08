@@ -212,10 +212,11 @@ void openFile( wchar_t* cstr) {
 	// print wchar_t string
 	wprintf(L"%s\n", cstr);
 
+		int num = inputPriorityFunc();
 	// check if cstr is "Music"
 	if (wcscmp(cstr, L"Music") == 0) {
 		printf("Music opened\n");
-		int num = inputPriorityFunc();
+		
 		printf("Music Priority: %d", num);
 		runThread(L"music.exe", num);
 		HANDLE hMonitorThread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)MonitorMemoryUsage, NULL, 0, NULL);
@@ -229,7 +230,7 @@ printf("Monitor thread created\n");
 		
 	}
 	else if (wcscmp(cstr, L"Notepad") == 0) {
-		int num = inputPriorityFunc();
+		
 		printf("Notepad Priority: %d", num);
 		runThread(L"notepad.exe", num);
 		printf("Notepad opened\n");
@@ -238,13 +239,20 @@ printf("Monitor thread created\n");
 		printf("Downloads folder opened\n");
 	}
 	else if (wcscmp(cstr, L"Git") == 0) {
-		int num = inputPriorityFunc();
 		printf("Git Priority: %d", num);
 		runThread(L"git-bash.lnk", num);
-		printf("Git Open opened\n");
+		printf("Git opened\n");
+	}
+	else if (wcscmp(cstr, L"Chrome") == 0) {
+		runThread(L"chrome.lnk", num);
+		printf("Chrome opened\n");
+	}
+	else if (wcscmp(cstr, L"Stop Watch") == 0) {
+		runThread(L"stopwatch.exe", num);
+		printf("Chrome opened\n");
 	}
 	else {
-		printf("Folder not found\n");
+		printf("Unknown File\n");
 	}
 	
 

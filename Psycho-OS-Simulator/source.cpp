@@ -2,6 +2,7 @@
 #include <iostream>
 #include <locale>
 #include <codecvt>
+#include "showAlert.h"
 extern "C" {
     void openFile(const wchar_t* cstr);
 }
@@ -98,32 +99,44 @@ int main()
         return 1;
     }
     sf::Texture git;
-    music.setSmooth(true);
+    git.setSmooth(true);
     if (!git.loadFromFile("D:/git.png"))
     {
         return 1;
     }
-   
-    folder.setSmooth(true);
-    folder.setRepeated(false);
 
-    // Create sprite and set its texture
-    sf::Sprite sprite;
-    sprite.setTexture(folder);
+    sf::Texture chrome;
+    chrome.setSmooth(true);
+    if (!chrome.loadFromFile("D:/chrome.png"))
+    {
+        return 1;
+    }
+    
+    sf::Texture stopwatch;
+    stopwatch.setSmooth(true);
+    if (!stopwatch.loadFromFile("D:/stopwatch.png"))
+    {
+        return 1;
+    }
 
-    // Set the size you want the sprite to appear
-    float scaleFactor = 0.5f; // Example: scale the sprite to half of its original size
-    sprite.setScale(scaleFactor, scaleFactor);
 
+
+
+
+ 
 
     std::vector<ClickableElement> clickableElements;
 
     ClickableElement mus(music, font, "Music", 50, 100);
     ClickableElement notepad(folder, font, "Notepad", 250, 100);
     ClickableElement gitHub(git, font, "Git", 450, 100);
+    ClickableElement Chrome(chrome, font, "Chrome", 50, 300);
+    ClickableElement Stopwatch(stopwatch, font, "Stop Watch", 250, 300);
     clickableElements.emplace_back(mus);
     clickableElements.emplace_back(notepad);
     clickableElements.emplace_back(gitHub);
+    clickableElements.emplace_back(Chrome);
+    clickableElements.emplace_back(Stopwatch);
     sf::RenderWindow window(sf::VideoMode(600, 600), "Psycho OS Simulator");
   /*  sf::CircleShape shape(100.f);
     shape.setFillColor(sf::Color::Green);*/
@@ -138,11 +151,23 @@ int main()
     aboutOption.setFillColor(sf::Color::White);
     aboutOption.setPosition(10, 10);
 
+    sf::Texture off;
+    off.setSmooth(true);
+    if (!off.loadFromFile("D:/off.png"))
+    {
+        return 1;
+    }
+    ClickableElement offBtn(off, font, "", 500, 10);
+
+
+
     sf::Clock clickClock;
     sf::Time clickCooldown = sf::milliseconds(900); // Adjust the time threshold for a double click
     sf::Vector2i clickPosition;
 
     sf::Clock clock;
+    bool mouseClicked = false;
+
 
 
     while (window.isOpen())
@@ -155,6 +180,17 @@ int main()
             case sf::Event::Closed:
                 window.close();
             case sf::Event::MouseButtonPressed:
+                sf::Vector2f mousePosition(static_cast<float>(event.mouseButton.x), static_cast<float>(event.mouseButton.y));
+                if (aboutOption.getGlobalBounds().contains(mousePosition)) {
+                    if (!mouseClicked) {
+                        showAlert();
+                       
+                    }
+                }
+
+                if(offBtn.isMouseOver(window)){
+					window.close();
+                };
                 for (auto& clickableElement : clickableElements) {
 
                     if (clickableElement.isMouseOver(window)) {
@@ -168,6 +204,7 @@ int main()
 
         window.clear();
         window.draw(aboutOption);
+        offBtn.draw(window);
 
         for (auto& clickableElement : clickableElements) {
 
