@@ -9,7 +9,7 @@ using namespace std;
 class ClickableElement {
 
 public:
-    ClickableElement(const sf::Texture& texture, const sf::Font& font, string comingText, float position, float positionY = 300)
+    ClickableElement(const sf::Texture& texture, const sf::Font& font, string comingText, float position, float positionY)
         : sprite(texture), isClicked(false) {
         // Set up sprite and text
         sprite.setPosition(sf::Vector2f(position, positionY));
@@ -79,7 +79,7 @@ private:
 };
 int main()
 {
-    std::cout << "Hello";
+    std::cout << "Welcome to Psycho OS";
     sf::Font font;
     if (!font.loadFromFile("D:/Roboto-Bold.ttf")) {
         // Handle error
@@ -88,6 +88,18 @@ int main()
     sf::Texture folder;
     folder.setSmooth(true);
     if (!folder.loadFromFile("D:/notepad.png"))
+    {
+        return 1;
+    }
+    sf::Texture music;
+    music.setSmooth(true);
+    if (!music.loadFromFile("D:/music-player.png"))
+    {
+        return 1;
+    }
+    sf::Texture git;
+    music.setSmooth(true);
+    if (!git.loadFromFile("D:/git.png"))
     {
         return 1;
     }
@@ -106,12 +118,12 @@ int main()
 
     std::vector<ClickableElement> clickableElements;
 
-    ClickableElement music(folder, font, "Music", 100);
-    ClickableElement notepad(folder, font, "Notepad", 300);
-    ClickableElement git(folder, font, "Git", 500);
-    clickableElements.emplace_back(music);
+    ClickableElement mus(music, font, "Music", 50, 100);
+    ClickableElement notepad(folder, font, "Notepad", 250, 100);
+    ClickableElement gitHub(git, font, "Git", 450, 100);
+    clickableElements.emplace_back(mus);
     clickableElements.emplace_back(notepad);
-    clickableElements.emplace_back(git);
+    clickableElements.emplace_back(gitHub);
     sf::RenderWindow window(sf::VideoMode(600, 600), "Psycho OS Simulator");
   /*  sf::CircleShape shape(100.f);
     shape.setFillColor(sf::Color::Green);*/

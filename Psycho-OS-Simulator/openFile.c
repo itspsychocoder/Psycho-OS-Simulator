@@ -3,7 +3,7 @@
 #include "openFile.h"
 #include "inputpriority.h"
 #include <Windows.h>
-
+#include <stdint.h>
 #include <Psapi.h>
 
 // create global array to store process id
@@ -14,9 +14,6 @@ int processCount = 0;
 void MonitorMemoryUsage() {
 	
 	while (1) {
-		// Get process handle for the current process
-		HANDLE hProcess = GetCurrentProcess();
-
 		// Loop through the thread IDs array and get info
 		for (int i = 0; i < processCount; i++) {
 			printf("Checking memory usage for thread %lu\n", threadIds[i]);
@@ -28,23 +25,46 @@ void MonitorMemoryUsage() {
 				return;
 			}
 
-			// Get memory information for the process associated with the thread
-			PROCESS_MEMORY_COUNTERS_EX pmc;
-			if (GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS*)&pmc, sizeof(pmc))) {
-				printf("Memory used by thread %lu: %lu KB\n", threadIds[i], pmc.WorkingSetSize / 1024);
-			}
-			else {
-				fprintf(stderr, "Failed to get process memory info\n");
+			HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, GetCurrentProcessId());
+			if (hProcess == NULL) {
+				fprintf(stderr, "Failed to open process. Error code: %lu\n", GetLastError());
 				CloseHandle(hThread);
-				return;
+				return 0;
 			}
 
-			// Close the thread handle
+			PROCESS_MEMORY_COUNTERS_EX pmcStart, pmcEnd;
+			DWORD dwStartTickCount = GetTickCount();
+
+			// Sample memory usage at the start
+			if (!GetProcessMemoryInfo(hProcess, (PROCESS_MEMORY_COUNTERS*)&pmcStart, sizeof(pmcStart))) {
+				fprintf(stderr, "Failed to get process memory info. Error code: %lu\n", GetLastError());
+				CloseHandle(hThread);
+				CloseHandle(hProcess);
+				return 0;
+			}
+
+			Sleep(2000); // Sleep for 5 seconds to simulate thread execution
+
+			// Sample memory usage again after some time
+			if (!GetProcessMemoryInfo(hProcess, (PROCESS_MEMORY_COUNTERS*)&pmcEnd, sizeof(pmcEnd))) {
+				fprintf(stderr, "Failed to get process memory info. Error code: %lu\n", GetLastError());
+				CloseHandle(hThread);
+				CloseHandle(hProcess);
+				return 0;
+			}
+
 			CloseHandle(hThread);
+			CloseHandle(hProcess);
+
+			// Calculate memory usage difference
+			uint64_t memoryUsageDiff = pmcEnd.WorkingSetSize - pmcStart.WorkingSetSize;
+
+			// Print memory usage difference
+			printf("Memory used by thread %lu: %I64u KB\n", threadIds[i], memoryUsageDiff / 1024);
+
+			
 		}
 
-		// Sleep for some time before checking again
-		Sleep(5000);
 	}
 }
 DWORD WINAPI ThreadFunction(LPVOID lpParam)
@@ -164,6 +184,7 @@ newPri = THREAD_PRIORITY_TIME_CRITICAL;
 		break;
 
 	}
+	printf("Setting thread priority to %d\n", newPri);
 	if (!SetThreadPriority(hThread, newPri)) {
 		printf("Failed to set thread priority");
 		CloseHandle(hThread);
@@ -197,6 +218,14 @@ void openFile( wchar_t* cstr) {
 		int num = inputPriorityFunc();
 		printf("Music Priority: %d", num);
 		runThread(L"music.exe", num);
+		HANDLE hMonitorThread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)MonitorMemoryUsage, NULL, 0, NULL);
+		if (hMonitorThread == NULL) {
+			fprintf(stderr, "Failed to create monitor thread\n");
+			return 1;
+		}
+		else {
+printf("Monitor thread created\n");
+		}
 		
 	}
 	else if (wcscmp(cstr, L"Notepad") == 0) {
@@ -217,10 +246,6 @@ void openFile( wchar_t* cstr) {
 	else {
 		printf("Folder not found\n");
 	}
-	HANDLE hMonitorThread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)MonitorMemoryUsage, NULL, 0, NULL);
-	if (hMonitorThread == NULL) {
-		fprintf(stderr, "Failed to create monitor thread\n");
-		return 1;
-	}
+	
 
 }
